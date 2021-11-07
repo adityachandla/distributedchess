@@ -37,6 +37,9 @@ public class CheckUtil {
         }
       }
     }
+    for(Piece[] row : pieces) {
+      System.out.println(Arrays.toString(row));
+    }
     throw new IllegalStateException("No king found :(");
   }
 
@@ -63,17 +66,27 @@ public class CheckUtil {
 
   private static boolean safeFromKnight(Piece[][] pieces, Position start) {
     Color color = pieces[start.row][start.col].getColor();
-    return isKnightSafe(pieces, start.diagonal(1,2), color);
+    return isSafeFromKnight(pieces, start.diagonal(1,2), color) &&
+        isSafeFromKnight(pieces, start.diagonal(-1, 2), color) &&
+        isSafeFromKnight(pieces, start.diagonal(-1, -2), color) &&
+        isSafeFromKnight(pieces, start.diagonal(1, -2), color) &&
+        isSafeFromKnight(pieces, start.diagonal(-2, -1), color) &&
+        isSafeFromKnight(pieces, start.diagonal(2, 1), color) &&
+        isSafeFromKnight(pieces, start.diagonal(-2, 1), color) &&
+        isSafeFromKnight(pieces, start.diagonal(2, -1), color);
   }
 
-  private static boolean isKnightSafe(Piece[][] pieces, Position position, Color color) {
+  private static boolean isSafeFromKnight(Piece[][] pieces, Position position, Color color) {
+    if(!Position.isValid(position)) {
+      return true;
+    }
     if(pieces[position.row][position.col] == null) {
       return true;
     }
     if(pieces[position.row][position.col].getType() != PieceType.KNIGHT) {
       return true;
     }
-    return pieces[position.row][position.col].getColor() != color;
+    return pieces[position.row][position.col].getColor() == color;
   }
 
   private static boolean checkSafetyDiagonal(Piece[][] pieces, Position start, PositionChanger positionChanger) {
@@ -129,7 +142,7 @@ public class CheckUtil {
     }
     Color enemyColor = kingColor == Color.WHITE ? Color.BLACK : Color.WHITE;
     int pawnForward = enemyColor == Color.WHITE ? 1 : -1;
-    if(rowDiff == pawnForward && colDiff == 1) {
+    if(rowDiff == pawnForward && Math.abs(colDiff) == 1) {
       return pieceType == PieceType.PAWN;
     }
     return false;

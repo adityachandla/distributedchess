@@ -39,6 +39,9 @@ public class Piece {
 
   @Override
   public String toString() {
+    if(this.type == PieceType.KING) {
+      return "K" + this.color.name().charAt(0);
+    }
     return String.format("%c %c", this.type.name().charAt(0), this.color.name().charAt(0));
   }
 }

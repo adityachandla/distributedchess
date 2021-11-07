@@ -183,8 +183,8 @@ public class MoveGenerator {
   private static List<Move> generateMoves(Piece[][] pieces, Position initial, PositionChanger positionChanger) {
     List<Move> moves = new ArrayList<>();
     Color color = pieces[initial.row][initial.col].getColor();
-    for(var current = initial.copy();
-        Position.isValid(positionChanger.change(current));
+    for(var current = positionChanger.change(initial);
+        Position.isValid(current);
         current = positionChanger.change(current)
     ) {
       if(pieces[current.row][current.col] == null) {
