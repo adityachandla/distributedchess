@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class MoveGenerator {
 
-  public List<Move> generateMoves(Piece[][] pieces, Color color) {
+  public static List<Move> generateMoves(Piece[][] pieces, Color color) {
     List<Position> possiblePositions = getPositions(pieces, color);
     List<Move> possibleMoves = new ArrayList<>(100);
     for(Position position : possiblePositions) {
@@ -22,7 +22,7 @@ public class MoveGenerator {
         .collect(Collectors.toList());
   }
 
-  private List<Position> getPositions(Piece[][] pieces, Color color) {
+  private static List<Position> getPositions(Piece[][] pieces, Color color) {
     List<Position> positions = new ArrayList<>(16);
     for(int row = 0; row < 8; row++) {
       for(int col = 0; col < 8; col++) {
@@ -34,7 +34,7 @@ public class MoveGenerator {
     return positions;
   }
 
-  private List<Move> getPossibleMovesForPosition(Piece[][] pieces, Position position) {
+  public static List<Move> getPossibleMovesForPosition(Piece[][] pieces, Position position) {
     Piece piece = pieces[position.row][position.col];
     return switch (piece.getType()) {
       case PAWN -> getMovesForPawn(pieces, position);
@@ -46,7 +46,7 @@ public class MoveGenerator {
     };
   }
 
-  private List<Move> getMovesForKnight(Piece[][] pieces, Position position) {
+  public static List<Move> getMovesForKnight(Piece[][] pieces, Position position) {
     List<Position> possiblePositions = getPossiblePositionsForKnight(position);
     Color color = pieces[position.row][position.col].getColor();
     return possiblePositions.stream()
@@ -55,7 +55,7 @@ public class MoveGenerator {
         .collect(Collectors.toList());
   }
 
-  private List<Position> getPossiblePositionsForKnight(Position initial) {
+  public static List<Position> getPossiblePositionsForKnight(Position initial) {
     List<Position> positions = new ArrayList<>();
     if(Position.isValid(initial.diagonal(2, 1))) {
       positions.add(initial.diagonal(2,1));
@@ -84,15 +84,15 @@ public class MoveGenerator {
     return positions;
   }
 
-  private List<Move> getMovesForRook(Piece[][] pieces, Position position) {
+  public static List<Move> getMovesForRook(Piece[][] pieces, Position position) {
     return getStraightMoves(pieces, position);
   }
 
-  private List<Move> getMovesForBishop(Piece[][] pieces, Position position) {
+  public static List<Move> getMovesForBishop(Piece[][] pieces, Position position) {
     return getDiagonalMoves(pieces, position);
   }
 
-  private List<Move> getMovesForKing(Piece[][] pieces, Position position) {
+  public static List<Move> getMovesForKing(Piece[][] pieces, Position position) {
     List<Position> validPositions = getValidPositionsForKing(position);
     Color color = pieces[position.row][position.col].getColor();
     return validPositions.stream()
@@ -101,7 +101,7 @@ public class MoveGenerator {
         .collect(Collectors.toList());
   }
 
-  private List<Position> getValidPositionsForKing(Position initial) {
+  private static List<Position> getValidPositionsForKing(Position initial) {
     List<Position> positions = new ArrayList<>();
     if(Position.isValid(initial.straight(1))) {
       positions.add(initial.straight(1));
@@ -130,14 +130,14 @@ public class MoveGenerator {
     return positions;
   }
 
-  private List<Move> getMovesForQueen(Piece[][] pieces, Position position) {
+  public static List<Move> getMovesForQueen(Piece[][] pieces, Position position) {
     List<Move> moves = new ArrayList<>(16);
     moves.addAll(getStraightMoves(pieces, position));
     moves.addAll(getDiagonalMoves(pieces, position));
     return moves;
   }
 
-  private List<Move> getMovesForPawn(Piece[][] pieces, Position position) {
+  public static List<Move> getMovesForPawn(Piece[][] pieces, Position position) {
     List<Move> moves = new ArrayList<>();
     Color color = pieces[position.row][position.col].getColor();
     int forward = color == Color.WHITE ? 1 : -1;
@@ -162,7 +162,7 @@ public class MoveGenerator {
     return moves;
   }
 
-  private List<Move> getDiagonalMoves(Piece[][] pieces, Position position) {
+  public static List<Move> getDiagonalMoves(Piece[][] pieces, Position position) {
     List<Move> moves = new ArrayList<>();
     moves.addAll(generateMoves(pieces, position, pos -> pos.diagonal(1,1)));
     moves.addAll(generateMoves(pieces, position, pos -> pos.diagonal(1,-1)));
@@ -171,7 +171,7 @@ public class MoveGenerator {
     return moves;
   }
 
-  private List<Move> getStraightMoves(Piece[][] pieces, Position position) {
+  public static List<Move> getStraightMoves(Piece[][] pieces, Position position) {
     List<Move> moves = new ArrayList<>();
     moves.addAll(generateMoves(pieces, position, pos -> pos.straight(1)));
     moves.addAll(generateMoves(pieces, position, pos -> pos.straight(-1)));
@@ -180,7 +180,7 @@ public class MoveGenerator {
     return moves;
   }
 
-  private List<Move> generateMoves(Piece[][] pieces, Position initial, PositionChanger positionChanger) {
+  private static List<Move> generateMoves(Piece[][] pieces, Position initial, PositionChanger positionChanger) {
     List<Move> moves = new ArrayList<>();
     Color color = pieces[initial.row][initial.col].getColor();
     for(var current = initial.copy();

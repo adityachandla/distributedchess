@@ -1,29 +1,25 @@
 package com.achandla.distributedchess.move;
 
+import com.achandla.distributedchess.board.Chessboard;
 import com.achandla.distributedchess.board.Color;
 import com.achandla.distributedchess.board.Move;
 import com.achandla.distributedchess.board.Piece;
 import com.achandla.distributedchess.board.PieceType;
 import com.achandla.distributedchess.board.Position;
 
+import java.util.Arrays;
+
 
 public class CheckUtil {
 
-  public synchronized static boolean isKingSafeAfterMove(Piece[][] pieces, Move move) {
+  public static boolean isKingSafeAfterMove(Piece[][] pieces, Move move) {
     Position start = move.start;
-    Position end = move.end;
     Color color = pieces[start.row][start.col].getColor();
-    Piece pieceStart =  pieces[start.row][start.col];
-    Piece pieceEnd = pieces[end.row][end.col];
 
-    pieces[start.row][start.col] = null;
-    pieces[end.row][end.col] = pieceStart;
+    Piece[][] piecesCopy = Chessboard.copyChessboard(pieces);
+    MoveMaker.makeMove(piecesCopy, move);
 
-    boolean safe = isKingSafe(pieces, color);
-
-    pieces[start.row][start.col] = pieceStart;
-    pieces[end.row][end.col] = pieceEnd;
-    return safe;
+    return isKingSafe(piecesCopy, color);
   }
 
   private static boolean isKingSafe(Piece[][] pieces, Color color) {
@@ -33,7 +29,7 @@ public class CheckUtil {
         safeFromKnight(pieces, kingPosition);
   }
 
-  private static Position findKing(Piece[][] pieces, Color color) {
+  public static Position findKing(Piece[][] pieces, Color color) {
     for(int i = 0; i < 8; i++) {
       for(int j = 0; j < 8; j++) {
         if(isKing(pieces[i][j], color)) {

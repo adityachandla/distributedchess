@@ -3,14 +3,34 @@ package com.achandla.distributedchess.board;
 public class Piece {
   private PieceType type;
   private Color color;
+  private int value;
 
   public Piece(PieceType type, Color color) {
     this.type = type;
     this.color = color;
+    this.value = getValue(type);
+  }
+
+  private int getValue(PieceType type) {
+    return switch (type) {
+      case PAWN -> 1;
+      case QUEEN -> 9;
+      case KING -> 0;
+      case ROOK -> 5;
+      case BISHOP, KNIGHT -> 3;
+    };
+  }
+
+  public int getValue() {
+    return this.value;
   }
 
   public PieceType getType() {
     return this.type;
+  }
+
+  public void setType(PieceType pieceType) {
+    this.type = pieceType;
   }
 
   public Color getColor() {

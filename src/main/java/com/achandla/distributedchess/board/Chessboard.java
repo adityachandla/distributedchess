@@ -45,8 +45,8 @@ public class Chessboard {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    for(int idx = 0; idx < pieces.length; idx++) {
-      sb.append(Arrays.toString(pieces[idx]));
+    for(Piece[] row : pieces) {
+      sb.append(Arrays.toString(row));
       sb.append("\n");
     }
     return sb.toString();
@@ -54,5 +54,17 @@ public class Chessboard {
 
   public Piece[][] getPieces() {
     return this.pieces;
+  }
+
+  public static Piece[][] copyChessboard(Piece[][] source) {
+    Piece[][] destination = new Piece[8][8];
+    for(int i = 0; i < 8; i++) {
+      for(int j = 0; j < 8; j++) {
+        if(source[i][j] != null) {
+          destination[i][j] = new Piece(source[i][j].getType(), source[i][j].getColor());
+        }
+      }
+    }
+    return destination;
   }
 }
