@@ -17,9 +17,11 @@ public class Main {
   public static void main(String[] args) throws IOException {
     Piece[][] pieces = Chessboard.initChessboard();
     MoveInput moveInput = new MoveInput();
+    MoveEngine moveEngine = new MoveEngine(3, Color.BLACK);
     Color turn = Color.WHITE;
     while (true) {
-      Move move = turn == Color.WHITE ? moveInput.takeInput() : MoveEngine.generateBestMove(pieces, turn);
+      Move move = turn == Color.WHITE ? moveInput.takeInput()
+          : moveEngine.generateBestMove(pieces).orElseThrow(IllegalStateException::new);
       if (move == null) {
         System.out.println("Game ended stalemate/checkmate");
         break;
@@ -28,7 +30,7 @@ public class Main {
         System.out.println(move);
       }
       MoveMaker.makeMove(pieces, move);
-      turn = Color.invert(turn);
+      turn = turn.invert();
     }
   }
 

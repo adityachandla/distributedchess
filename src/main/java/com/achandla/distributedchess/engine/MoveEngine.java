@@ -8,61 +8,63 @@ import com.achandla.distributedchess.evaluator.Evaluator;
 import com.achandla.distributedchess.move.MoveGenerator;
 import com.achandla.distributedchess.move.MoveMaker;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class MoveEngine {
 
-  private static final int HALF_MOVE_DEPTH = 3;
+  private final int halfMoveDepth;
+  private final Color myColor;
 
-  private static class MoveValue {
-    Move move;
-    int value;
-
-    MoveValue(Move move, int value) {
-      this.move = move;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      return String.format("%s %d\n", move, value);
-    }
+  public MoveEngine(int halfMoveDepth, Color myColor) {
+    this.halfMoveDepth = halfMoveDepth;
+    this.myColor = myColor;
   }
 
-  public static Move generateBestMove(Piece[][] pieces, Color color) {
-    List<Move> moves = MoveGenerator.generateMoves(pieces, color);
-    List<MoveValue> moveValues = moves.parallelStream()
-        .map(move -> {
-          Piece[][] copy = Chessboard.copyChessboard(pieces);
-          return new MoveValue(move, getMoveValue(copy, Color.invert(color), move, HALF_MOVE_DEPTH));
-        }).collect(Collectors.toList());
-    System.out.println(moveValues);
-    return moveValues.stream()
-        .max(Comparator.comparingInt(moveVal -> moveVal.value))
-        .map(moveVal -> moveVal.move)
-        .orElse(null);
+  public Optional<Move> generateBestMove(Piece[][] pieces) {
+    List<Move> possibleMoves = MoveGenerator.generateMoves(pieces, myColor);
+    Optional<Move> bestMove = Optional.empty();
+    int maxValue = Integer.MIN_VALUE;
+    for(Move move: possibleMoves) {
+      Piece[][] afterMove = Chessboard.copyChessboard(pieces);
+      MoveMaker.makeMove(afterMove, move);
+      int value = minimize(afterMove, halfMoveDepth, myColor.invert());
+      if(value == Integer.MAX_VALUE) {
+        return Optional.of(move);
+      }
+      if(value > maxValue) {
+        maxValue = value;
+        bestMove = Optional.of(move);
+      }
+    }
+    return bestMove;
   }
 
-  private static int getMoveValue(Piece[][] pieces, Color color, Move move, int depth) {
-    MoveMaker.makeMove(pieces, move);
-    if (depth == 0) {
-      return Evaluator.getValue(pieces, color);
+  private int maximize(Piece[][] pieces, int depth, Color turn) {
+    if(depth == 0) {
+      return Evaluator.getValue(pieces, myColor);
     }
-    //Recursive step
-    List<Move> moves = MoveGenerator.generateMoves(pieces, color);
-    if (moves.size() == 0) {
-      return Integer.MIN_VALUE;
+    List<Move> possibleMoves = MoveGenerator.generateMoves(pieces, turn);
+    int val = Integer.MIN_VALUE;
+    for(Move move : possibleMoves) {
+      Piece[][] piecesAfterMove = Chessboard.copyChessboard(pieces);
+      MoveMaker.makeMove(piecesAfterMove, move);
+      val = Integer.max(val, minimize(piecesAfterMove, depth-1, turn.invert()));
     }
-    Color nextColor = Color.invert(color);
-    int maxValue = -1;
-    for (Move nextMove : moves) {
-      Piece[][] copy = Chessboard.copyChessboard(pieces);
-      int val = getMoveValue(copy, nextColor, nextMove, depth - 1);
-      maxValue = Integer.max(maxValue, val);
+    return val;
+  }
+
+  private int minimize(Piece[][] pieces, int depth, Color turn) {
+    if(depth == 0) {
+      return Evaluator.getValue(pieces, myColor);
     }
-    return maxValue;
+    List<Move> possibleMoves = MoveGenerator.generateMoves(pieces, turn);
+    int val = Integer.MAX_VALUE;
+    for(Move move : possibleMoves) {
+      Piece[][] piecesAfterMove = Chessboard.copyChessboard(pieces);
+      MoveMaker.makeMove(piecesAfterMove, move);
+      val = Integer.min(val, maximize(piecesAfterMove, depth-1, turn.invert()));
+    }
+    return val;
   }
 }

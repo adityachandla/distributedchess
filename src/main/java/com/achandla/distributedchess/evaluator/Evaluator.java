@@ -2,6 +2,7 @@ package com.achandla.distributedchess.evaluator;
 
 import com.achandla.distributedchess.board.Color;
 import com.achandla.distributedchess.board.Piece;
+import com.achandla.distributedchess.move.CheckUtil;
 
 public class Evaluator {
 

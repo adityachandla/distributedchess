@@ -4,7 +4,7 @@ public enum Color {
   BLACK,
   WHITE;
 
-  public static Color invert(Color color) {
-    return color == Color.WHITE ? Color.BLACK : Color.WHITE;
+  public Color invert() {
+    return this == Color.WHITE ? Color.BLACK : Color.WHITE;
   }
 }
