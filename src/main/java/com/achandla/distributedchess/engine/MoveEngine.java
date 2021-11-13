@@ -4,40 +4,35 @@ import com.achandla.distributedchess.board.Chessboard;
 import com.achandla.distributedchess.board.Color;
 import com.achandla.distributedchess.board.Move;
 import com.achandla.distributedchess.board.Piece;
+import com.achandla.distributedchess.board.Position;
 import com.achandla.distributedchess.evaluator.Evaluator;
 import com.achandla.distributedchess.move.MoveGenerator;
 import com.achandla.distributedchess.move.MoveMaker;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class MoveEngine {
+public record MoveEngine(int halfMoveDepth, Color myColor) {
 
-  private final int halfMoveDepth;
-  private final Color myColor;
-
-  public MoveEngine(int halfMoveDepth, Color myColor) {
-    this.halfMoveDepth = halfMoveDepth;
-    this.myColor = myColor;
-  }
+  private record MoveValue(
+      Move move,
+      int value
+  ){}
 
   public Optional<Move> generateBestMove(Piece[][] pieces) {
-    List<Move> possibleMoves = MoveGenerator.generateMoves(pieces, myColor);
-    Optional<Move> bestMove = Optional.empty();
-    int maxValue = Integer.MIN_VALUE;
-    for(Move move: possibleMoves) {
-      Piece[][] afterMove = Chessboard.copyChessboard(pieces);
-      MoveMaker.makeMove(afterMove, move);
-      int value = minimize(afterMove, halfMoveDepth, myColor.invert());
-      if(value == Integer.MAX_VALUE) {
-        return Optional.of(move);
-      }
-      if(value > maxValue) {
-        maxValue = value;
-        bestMove = Optional.of(move);
-      }
-    }
-    return bestMove;
+    return MoveGenerator.generateMoves(pieces, myColor).parallelStream()
+        .map(move -> getMoveValue(pieces, move))
+        .max(Comparator.comparingInt(MoveValue::value))
+        .map(MoveValue::move);
+  }
+
+  private MoveValue getMoveValue(Piece[][] pieces, Move move) {
+    Piece[][] boardCopy = Chessboard.copyChessboard(pieces);
+    MoveMaker.makeMove(boardCopy, move);
+    int value = minimize(boardCopy, halfMoveDepth, myColor.invert());
+    return new MoveValue(move, value);
   }
 
   private int maximize(Piece[][] pieces, int depth, Color turn) {

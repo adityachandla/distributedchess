@@ -2,9 +2,12 @@ package com.achandla.distributedchess.evaluator;
 
 import com.achandla.distributedchess.board.Color;
 import com.achandla.distributedchess.board.Piece;
-import com.achandla.distributedchess.move.CheckUtil;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Evaluator {
+
+  public static AtomicInteger evaluated = new AtomicInteger();
 
   /**
    * Assign a value to position. Higher the better.
@@ -27,6 +30,7 @@ public class Evaluator {
         }
       }
     }
+    evaluated.getAndIncrement();
     return value;
   }
 }

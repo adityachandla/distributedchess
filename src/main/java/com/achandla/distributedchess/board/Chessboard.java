@@ -32,13 +32,8 @@ public class Chessboard {
     pieces[row][2] = new Piece(PieceType.BISHOP, color);
     pieces[row][5] = new Piece(PieceType.BISHOP, color);
 
-    if (color == Color.WHITE) {
-      pieces[row][3] = new Piece(PieceType.QUEEN, color);
-      pieces[row][4] = new Piece(PieceType.KING, color);
-    } else {
-      pieces[row][4] = new Piece(PieceType.QUEEN, color);
-      pieces[row][3] = new Piece(PieceType.KING, color);
-    }
+    pieces[row][3] = new Piece(PieceType.QUEEN, color);
+    pieces[row][4] = new Piece(PieceType.KING, color);
   }
 
   public static Piece[][] copyChessboard(Piece[][] source) {
