@@ -6,6 +6,7 @@ import com.achandla.distributedchess.board.Position;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class MoveInput {
@@ -16,11 +17,16 @@ public class MoveInput {
     this.br = new BufferedReader(new InputStreamReader(System.in));
   }
 
-  public Move takeInput() throws IOException{
+  public Optional<Move> takeInput() {
     System.out.println("Enter start and end position");
-    Position start = inputPosition();
-    Position end = inputPosition();
-    return new Move(start, end);
+    try {
+      Position start = inputPosition();
+      Position end = inputPosition();
+      return Optional.of(new Move(start, end));
+    }catch (IOException ioException) {
+      ioException.printStackTrace();
+      return Optional.empty();
+    }
   }
 
   private Position inputPosition() throws IOException {

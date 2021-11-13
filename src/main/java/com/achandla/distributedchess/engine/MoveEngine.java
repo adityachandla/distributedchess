@@ -16,16 +16,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public record MoveEngine(int halfMoveDepth, Color myColor) {
 
-  private record MoveValue(
+  public record MoveValue(
       Move move,
       int value
   ){}
 
-  public Optional<Move> generateBestMove(Piece[][] pieces) {
-    return MoveGenerator.generateMoves(pieces, myColor).parallelStream()
+  public Optional<MoveValue> evaluateBestMove(Piece[][] pieces, List<Move> moves) {
+    return moves.parallelStream()
         .map(move -> getMoveValue(pieces, move))
-        .max(Comparator.comparingInt(MoveValue::value))
-        .map(MoveValue::move);
+        .max(Comparator.comparingInt(MoveValue::value));
   }
 
   private MoveValue getMoveValue(Piece[][] pieces, Move move) {
