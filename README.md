@@ -34,3 +34,6 @@ A move is represented with a start position and an end position. The notation fo
 end position is a little different and is defined in the image below: 
 
 ![Image](/markedBoard.png "board positions")
+
+Computer always plays black and black pieces and black pieces are always placed
+on 6th and 7th row.
