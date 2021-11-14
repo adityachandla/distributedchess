@@ -5,6 +5,7 @@ import com.achandla.distributedchess.board.Color;
 import com.achandla.distributedchess.board.Move;
 import com.achandla.distributedchess.board.Piece;
 import com.achandla.distributedchess.engine.MoveEngine;
+import com.achandla.distributedchess.evaluator.Evaluator;
 import com.achandla.distributedchess.move.MoveGenerator;
 import com.achandla.distributedchess.move.MoveMaker;
 
@@ -56,9 +57,10 @@ public class ChessClient {
       System.out.println("Received request to make move " + message);
       makeMove(message);
     } else if (message.equalsIgnoreCase("calculate")) {
+      Evaluator.evaluated.getAndSet(0);
       System.out.println("Received request to evaluate");
       generateBestMove();
-      System.out.println("Completed evaluation request");
+      System.out.printf("Computed total %d moves\n", Evaluator.evaluated.get());
     }
   }
 
