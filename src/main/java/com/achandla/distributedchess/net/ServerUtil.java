@@ -44,8 +44,8 @@ public class ServerUtil {
   }
 
   public static Move convertStringToMove(String move) {
-    Position start = new Position(charToInt(move.charAt(0)), charToInt(move.charAt(1)));
-    Position end = new Position(charToInt(move.charAt(2)), charToInt(move.charAt(3)));
+    Position start = new Position(charToInt(move.charAt(1)), charToInt(move.charAt(2)));
+    Position end = new Position(charToInt(move.charAt(3)), charToInt(move.charAt(4)));
     return new Move(start, end);
   }
 

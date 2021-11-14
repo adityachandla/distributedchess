@@ -1,5 +1,6 @@
 package com.achandla.distributedchess.net;
 
+import com.achandla.distributedchess.board.Chessboard;
 import com.achandla.distributedchess.board.Color;
 import com.achandla.distributedchess.board.Move;
 import com.achandla.distributedchess.board.Piece;
@@ -38,7 +39,7 @@ public class ChessServer {
   public static void startGame(int numClients, int depth) throws IOException {
     List<Client> clients = initializeClients(numClients, depth);
     System.out.printf("Connected to all %d clients\n", clients.size());
-    Piece[][] pieces = new Piece[8][8];
+    Piece[][] pieces = Chessboard.initChessboard();
     MoveInput moveInput = new MoveInput();
     Color turn = Color.WHITE;
     while (true) {
@@ -49,6 +50,9 @@ public class ChessServer {
       }
       sendMoveToClients(clients, move.get());
       MoveMaker.makeMove(pieces, move.get());
+      if(turn == Color.BLACK) {
+        System.out.println(move);
+      }
       turn = turn.invert();
     }
   }
@@ -62,8 +66,8 @@ public class ChessServer {
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
       clients.add(new Client(socket, reader, writer));
 
-      writer.write(String.format("%d %d", numClients, i));
-      writer.write(String.format("%d", depth));
+      writer.write(String.format("%d %d\n", numClients, i));
+      writer.write(String.format("%d\n", depth));
       writer.flush();
     }
     return clients;
@@ -71,6 +75,7 @@ public class ChessServer {
 
   private static Optional<Move> calculateBestMove(List<Client> clients) {
     ServerUtil.sendMessage(clients, "calculate");
+    System.out.println("Sent request to Clients for evaluation");
     return ServerUtil.readMessage(clients).stream()
         .filter(Predicate.not("nil"::equalsIgnoreCase))
         .max(Comparator.comparingInt(ChessServer::extractValue))
@@ -105,7 +110,7 @@ public class ChessServer {
     String moveString = ServerUtil.convertMoveToString(move);
     ServerUtil.sendMessage(clients, moveString);
     boolean error = ServerUtil.readMessage(clients).stream()
-        .anyMatch(Predicate.not(message -> message.equalsIgnoreCase("ack")));
+        .anyMatch(Predicate.not("ack"::equalsIgnoreCase));
     if (error) {
       throw new IllegalStateException("Client did not send acknowledgement");
     }

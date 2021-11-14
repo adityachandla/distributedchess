@@ -53,15 +53,19 @@ public class ChessClient {
   public void respond() {
     String message = ClientUtil.readLine(reader);
     if (message.startsWith("m")) {
+      System.out.println("Received request to make move " + message);
       makeMove(message);
-    } else if (message.equalsIgnoreCase("execute")) {
+    } else if (message.equalsIgnoreCase("calculate")) {
+      System.out.println("Received request to evaluate");
       generateBestMove();
+      System.out.println("Completed evaluation request");
     }
   }
 
   private void makeMove(String message) {
     Move move = ServerUtil.convertStringToMove(message);
     MoveMaker.makeMove(pieces, move);
+    ClientUtil.write(writer, "ack");
   }
 
   private void generateBestMove() {
@@ -75,7 +79,9 @@ public class ChessClient {
         .orElseThrow();
     String moveString = ServerUtil.convertMoveToString(bestMove.move());
     String valueString = Integer.toString(bestMove.value());
-    ClientUtil.write(writer, String.format("%s %s", moveString, valueString));
+    String result = String.format("%s %s", moveString, valueString);
+    ClientUtil.write(writer, result);
+    System.out.println("Sent " + result);
   }
 
   private List<Move> partitionMoves(List<Move> possibleMoves) {
