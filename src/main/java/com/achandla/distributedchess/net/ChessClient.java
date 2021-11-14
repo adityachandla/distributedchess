@@ -73,6 +73,7 @@ public class ChessClient {
   private void generateBestMove() {
     List<Move> possibleMoves = MoveGenerator.generateMoves(pieces, myColor);
     List<Move> movesToEvaluate = partitionMoves(possibleMoves);
+    System.out.printf("Starting evaluation of %d moves\n", movesToEvaluate.size());
     if (movesToEvaluate.isEmpty()) {
       ClientUtil.write(writer, "nil");
       return;
